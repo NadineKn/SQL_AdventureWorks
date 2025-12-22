@@ -84,4 +84,45 @@ GROUP BY
 ORDER BY
     OrderValue DESC
 
---- Djupanalys alternativ:
+--- Djupanalys alternativ A:
+
+---Visualisering 8:
+SELECT
+    st.Name AS Region,
+    COUNT(DISTINCT soh.SalesOrderID) AS TotalOrders,
+    SUM(soh.TotalDue) / COUNT(soh.SalesOrderID) AS OrderValue
+FROM Sales.SalesOrderHeader soh
+INNER JOIN Sales.SalesTerritory st ON soh.TerritoryID = st.TerritoryID
+GROUP BY
+    st.Name
+ORDER BY
+    OrderValue DESC
+
+---Visualisering 9:
+SELECT
+    st.Name AS Region,
+    pc.Name AS ProductCategory,
+    SUM(sod.LineTotal) AS TotalSales
+FROM Sales.SalesOrderHeader soh
+INNER JOIN Sales.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
+INNER JOIN Production.Product p ON sod.ProductID = p.ProductID
+INNER JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID
+INNER JOIN Production.ProductCategory pc ON ps.ProductCategoryID = pc.ProductCategoryID
+INNER JOIN Sales.SalesTerritory st ON soh.TerritoryID = st.TerritoryID
+GROUP BY
+    st.Name, pc.Name
+ORDER BY
+    st.Name, TotalSales DESC
+
+---Visualisering 10:
+SELECT
+    st.Name AS Region,
+    YEAR(soh.OrderDate) AS SalesYear,
+    MONTH(soh.OrderDate) AS SalesMonth,
+    SUM(soh.TotalDue) AS TotalSales
+FROM Sales.SalesOrderHeader soh
+JOIN Sales.SalesTerritory st ON soh.TerritoryID = st.TerritoryID
+GROUP BY
+    st.Name, YEAR(soh.OrderDate), MONTH(soh.OrderDate)
+ORDER BY
+    st.Name, SalesYear, SalesMonth
